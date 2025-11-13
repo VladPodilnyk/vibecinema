@@ -8,5 +8,22 @@
   },
   "observability": {
     "enabled": true
-  }
+  },
+  "ai": {
+    "binding": "ai",
+    "remote": true
+  },
+  "vectorize": [
+    {
+      "binding": "vectorize",
+      "index_name": "vc-vector-index"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "db",
+      "database_name": "vc-movies",
+      "database_id": "1c72ef3f-fbe9-437c-a743-c6cc96a05ad6"
+    }
+  ]
 }
