@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "vibecinema",
   "main": "worker/index.ts",
-  "compatibility_date": "2025-11-11",
+  "compatibility_date": "2025-11-05",
   "assets": {
     "not_found_handling": "single-page-application"
   },
@@ -16,14 +16,16 @@
   "vectorize": [
     {
       "binding": "vectorize",
-      "index_name": "vc-vector-index"
+      "index_name": "vc-vector-index",
+      "remote": true
     }
   ],
   "d1_databases": [
     {
       "binding": "db",
       "database_name": "vc-movies",
-      "database_id": "1c72ef3f-fbe9-437c-a743-c6cc96a05ad6"
+      "database_id": "1c72ef3f-fbe9-437c-a743-c6cc96a05ad6",
+      "remote": true
     }
   ]
 }

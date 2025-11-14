@@ -1,12 +1,14 @@
-export default {
-  fetch(request) {
-    const url = new URL(request.url);
+import { Hono } from "hono";
 
-    if (url.pathname.startsWith("/api/")) {
-      return Response.json({
-        name: "Cloudflare",
-      });
-    }
-    return new Response(null, { status: 404 });
-  },
-} satisfies ExportedHandler<Env>;
+interface Bindings {
+  ai: Ai;
+  vectorize: Vectorize;
+  db: D1Database;
+}
+
+const app = new Hono<{ Bindings: Bindings }>().get("/api", async (c) => {
+  return c.json({ name: "CF" });
+});
+
+export type AppType = typeof app;
+export default app;

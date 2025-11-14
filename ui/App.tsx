@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import client from "./client/api";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -21,7 +22,8 @@ function App() {
       <div className="card">
         <button
           onClick={() => {
-            fetch("/api/")
+            client.api
+              .$get()
               .then((res) => res.json() as Promise<{ name: string }>)
               .then((data) => setName(data.name));
           }}
