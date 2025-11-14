@@ -13,10 +13,12 @@
     "build:rag": "tsx --env-file=.env ./rag/seed.ts"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.7.4",
     "csv": "^6.4.1",
     "hono": "^4.10.5",
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.14.0",

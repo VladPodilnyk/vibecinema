@@ -2,42 +2,38 @@ import React, { useState } from "react";
 import client from "./client/api";
 
 function App() {
-  const [count, setCount] = useState(0);
-  const [name, setName] = useState("unknown");
+  const [searchQ, setSearchQ] = useState("");
+  const [results, setSearchRes] = useState<Array<Record<string, any>>>([]);
+
+  const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQ(event.target.value);
+  };
 
   return (
     <>
-      <h1>Vite + React + Cloudflare</h1>
+      <h1>TEST</h1>
       <div className="card">
-        <button
-          onClick={() => setCount((count) => count + 1)}
-          aria-label="increment"
-        >
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <div className="card">
+        <input value={searchQ} onChange={onInputChange} />
         <button
           onClick={() => {
-            client.api
-              .$get()
-              .then((res) => res.json() as Promise<{ name: string }>)
-              .then((data) => setName(data.name));
+            client.vibe
+              .$get({ query: { q: encodeURIComponent(searchQ) } })
+              .then(
+                (res) =>
+                  res.json() as Promise<{ movies: Array<Record<string, any>> }>
+              )
+              .then((data) => setSearchRes(data.movies));
           }}
           aria-label="get name"
         >
-          Name from API is: {name}
+          Search
         </button>
-        <p>
-          Edit <code>worker/index.ts</code> to change the name
-        </p>
+        {results.map((v) => (
+          <p key={v.id}>
+            Title: {v.title} Genre: {v.genre}{" "}
+          </p>
+        ))}
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
   );
 }
