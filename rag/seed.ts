@@ -11,55 +11,43 @@ interface MovieRecord {
   posterLink: string;
 }
 
+type BaseMovieData = Pick<MovieRecord, "title" | "overview" | "genre">;
+
+interface EmbeddingsData extends BaseMovieData {
+  id: number;
+}
+
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 class RAGBuilder {
   private readonly datasetFile = "./datasets/imdb_top_1000.csv";
-  private readonly offsetFile = "./rag_builder_offset.txt";
-  private recordOffset: number;
+  private readonly embeddingsFile = "./embeddings.ndjson";
 
-  constructor(private readonly client: CFClient) {
-    this.recordOffset = 0;
-  }
-
-  public recover(): RAGBuilder {
-    if (fs.existsSync(this.offsetFile)) {
-      console.log("Found stored offset. Recovering...");
-      const lastOffset = fs.readFileSync(this.offsetFile).toString();
-      this.recordOffset = Number(lastOffset.trim());
-      console.log(`Current offset is ${this.recordOffset}`);
-    }
-    return this;
-  }
+  constructor(private readonly client: CFClient) {}
 
   public async seedStorage(): Promise<void> {
     let data = await this.parseDataset();
 
-    if (this.recordOffset > 0) {
-      console.log("Skipping processed records...");
-      data = data.slice(this.recordOffset + 1, data.length);
+    for await (const movie of data) {
+      const recordId = await this.insertMovieData(movie);
+      console.log(`Uploaded movie: ${movie.title}, RecordId: ${recordId}`);
+      console.log("Sleeping...");
+      await sleep(3000);
     }
-
-    await this.runSafe(async () => {
-      for await (const movie of data) {
-        const embeddings = await this.vectorize(movie);
-        const recordId = await this.insertMovieData(movie);
-        await this.client.insertVector(recordId, embeddings);
-        console.log(`Finished uploading ${this.recordOffset + 1}`);
-        this.recordOffset += 1;
-        console.log("Sleeping...");
-        await sleep(3000);
-      }
-    });
   }
 
-  private async runSafe(effect: () => Promise<void>): Promise<void> {
-    try {
-      await effect();
-    } catch (e) {
-      console.log("RAG builder failed with error: ", e);
-      fs.writeFileSync(this.offsetFile, `${this.recordOffset}`);
+  public async makeEmbeddings() {
+    const dataset = await this.readDatasetFromDb();
+    const result: string[] = [];
+
+    for (const value of dataset) {
+      const vector = await this.vectorize(value);
+      result.push(JSON.stringify({ id: value.id, values: vector }));
+      console.log(`Processed record ID: ${value.id} Title: ${value.title}`);
+      await sleep(3000);
     }
+
+    fs.writeFileSync(this.embeddingsFile, result.join("\n"));
   }
 
   private async parseDataset(): Promise<MovieRecord[]> {
@@ -86,15 +74,15 @@ class RAGBuilder {
     return data;
   }
 
-  private vectorize(movie: MovieRecord) {
+  private vectorize(movie: BaseMovieData) {
     return this.client.generateEmbeddings({
       model: "@cf/google/embeddinggemma-300m",
       text: `
-            Movie
-            Title: ${movie.title}
-            Overview: ${movie.overview}
-            Genre: ${movie.genre}
-        `,
+              Movie
+              Title: ${movie.title}
+              Overview: ${movie.overview}
+              Genre: ${movie.genre}
+          `,
     });
   }
 
@@ -116,6 +104,16 @@ class RAGBuilder {
     const body = await response.json();
     return body.result[0].meta.last_row_id;
   }
+
+  private async readDatasetFromDb(): Promise<Array<EmbeddingsData>> {
+    const sql = `
+        SELECT id, title, overview, genre FROM movies
+        LIMIT 2000
+    `;
+    const response = await this.client.execD1Query({ sql, params: [] });
+    const body = await response.json();
+    return body.result[0].results;
+  }
 }
 
 const accountId = process.env["CF_ACCOUNT_ID"];
@@ -127,7 +125,6 @@ if (accountId === undefined || apiToken === undefined) {
 
 const builder = new RAGBuilder(new CFClient(accountId, apiToken));
 builder
-  .recover()
-  .seedStorage()
+  .makeEmbeddings()
   .then(() => console.log("Done!"))
   .catch((e) => console.log("Failed with ", e));

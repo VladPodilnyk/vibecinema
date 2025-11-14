@@ -32,3 +32,4 @@ dist-ssr
 
 # RAG builder
 rag_builder_offset.txt
+embeddings.ndjson
