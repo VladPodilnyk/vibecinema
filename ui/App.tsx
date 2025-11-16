@@ -2,17 +2,18 @@ import { useEffect, useState } from "react";
 import { SearchBar } from "./components/search-bar";
 import { SearchResults } from "./components/search-results";
 import { useSearchParams } from "react-router";
+import client from "./client/api";
+import type { Movie } from "../worker/types";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSearching, setIsSearching] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<Movie[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const query = searchParams.get("q");
     if (query) {
-      setSearchQuery(query);
       setIsSearching(true);
       setIsLoading(true);
       setTimeout(() => setIsLoading(false), 1500);
@@ -21,11 +22,12 @@ function App() {
 
   const handleSearch = async (query: string) => {
     setSearchParams(`/?q=${encodeURIComponent(query)}`);
-    setSearchQuery(query);
     setIsSearching(true);
     setIsLoading(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const response = await client.vibe.$get({ query: { q: query } });
+    const { movies } = await response.json();
+    setSearchResults(movies);
     setIsLoading(false);
   };
 
@@ -43,7 +45,7 @@ function App() {
                 What mood do you have today?
               </h1>
               <p className="text-xl text-muted-foreground">
-                Discover content that matches how you feel
+                Discover content that matches your vibe
               </p>
             </div>
           )}
@@ -51,7 +53,7 @@ function App() {
           <SearchBar onSearch={handleSearch} />
 
           {isSearching && (
-            <SearchResults query={searchQuery} isLoading={isLoading} />
+            <SearchResults movies={searchResults} isLoading={isLoading} />
           )}
         </div>
       </div>
