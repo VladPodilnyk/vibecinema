@@ -52,7 +52,9 @@ async function fetchByIds(ctx: AppContext, ids: number[]): Promise<Movie[]> {
     genre: v.genre,
     year: v.release_year,
     imdbRating: v.imdb_rating,
-    posterLink: v.poster_link,
+    // This is a hack to get better image resolution from Amazon. It basically strips all size-related info from URLs
+    // Unfortunately I didn't do that when I seeded the DB, and then I was just lazy to fix the data in the DB :/
+    posterLink: v.poster_link.replace(/_V1_.*\.jpg$/, "_V1_.jpg"),
   }));
 }
 

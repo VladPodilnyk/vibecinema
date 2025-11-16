@@ -1,5 +1,7 @@
 import type { Movie } from "../../worker/types";
 import { Card } from "./card";
+import { GenreBadge } from "./genre-badge";
+import { MoviePoster } from "./movie-poster";
 import { Spinner } from "./spinner";
 
 function getRatingColor(rating: number): string {
@@ -37,11 +39,7 @@ export function SearchResults({ movies, isLoading }: SearchResultsProps) {
               >
                 <div className="flex gap-4 p-4">
                   <div className="relative h-48 w-32 shrink-0 overflow-hidden rounded-md bg-muted">
-                    <img
-                      src={movie.posterLink}
-                      alt={`${movie.title} poster`}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
+                    <MoviePoster src={movie.posterLink} alt={movie.title} />
                   </div>
                   <div className="flex flex-1 flex-col">
                     <div className="mb-2 flex items-start justify-between gap-2">
@@ -56,12 +54,10 @@ export function SearchResults({ movies, isLoading }: SearchResultsProps) {
                         {movie.imdbRating.toFixed(1)}
                       </span>
                     </div>
-                    <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                       <span>{movie.year}</span>
                       <span>•</span>
-                      <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                        {movie.genre}
-                      </span>
+                      <GenreBadge genre={movie.genre} />
                     </div>
                     <p className="line-clamp-3 text-sm text-muted-foreground">
                       {movie.overview}
