@@ -44,11 +44,13 @@ function App() {
           )}
 
           <SearchBar onSearch={handleSearch} />
-          <SearchResults
-            movies={movies}
-            isLoading={isLoading}
-            isError={isError}
-          />
+          {isSearching && (
+            <SearchResults
+              movies={movies}
+              isLoading={isLoading}
+              isError={isError}
+            />
+          )}
         </div>
       </div>
     </div>
