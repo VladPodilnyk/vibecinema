@@ -14,10 +14,12 @@
   },
   "dependencies": {
     "@hono/zod-validator": "^0.7.4",
+    "@tailwindcss/vite": "^4.1.17",
     "csv": "^6.4.1",
     "hono": "^4.10.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "tailwindcss": "^4.1.17",
     "zod": "^4.1.12"
   },
   "devDependencies": {
