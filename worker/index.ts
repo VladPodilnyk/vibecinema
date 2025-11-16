@@ -14,7 +14,7 @@ const app = new Hono<{ Bindings: Bindings }>().get(
       return c.json({ movies: [] as Movie[] });
     }
 
-    const movies = await searchService.fetchByIds(c, similar);
+    const movies = await searchService.fetchByIds(c, similar.map(Number));
     return c.json({ movies: movies });
   }
 );

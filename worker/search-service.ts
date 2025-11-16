@@ -2,6 +2,16 @@ import type { AppContext, Movie, SimilarVectorSearchOptions } from "./types";
 
 const ML_MODEL = "@cf/google/embeddinggemma-300m";
 
+interface MovieDbRow {
+  id: number;
+  title: string;
+  overview: string;
+  release_year: number;
+  imdb_rating: number;
+  genre: string;
+  poster_link: string;
+}
+
 async function getSimilarMovieIds(
   ctx: AppContext,
   query: string,
@@ -23,7 +33,7 @@ async function getSimilarMovieIds(
   return result;
 }
 
-async function fetchByIds(ctx: AppContext, ids: string[]): Promise<Movie[]> {
+async function fetchByIds(ctx: AppContext, ids: number[]): Promise<Movie[]> {
   const placeholders = ids.map(() => "?").join(",");
   const query = `
     SELECT * FROM movies
@@ -33,9 +43,17 @@ async function fetchByIds(ctx: AppContext, ids: string[]): Promise<Movie[]> {
   const { results } = await ctx.env.db
     .prepare(query)
     .bind(...ids)
-    .run<Movie>();
+    .run<MovieDbRow>();
 
-  return results;
+  return results.map((v) => ({
+    id: v.id,
+    title: v.title,
+    overview: v.overview,
+    genre: v.genre,
+    year: v.release_year,
+    imdbRating: v.imdb_rating,
+    posterLink: v.poster_link,
+  }));
 }
 
 export default {

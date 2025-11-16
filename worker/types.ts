@@ -18,7 +18,7 @@ export interface Movie {
   title: string;
   overview: string;
   year: number;
-  imbdRating: number;
+  imdbRating: number;
   genre: string;
   posterLink: string;
 }
