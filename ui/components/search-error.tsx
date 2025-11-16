@@ -1,9 +1,4 @@
-interface SearchErrorProps {
-  query: string;
-  onRetry: () => void;
-}
-
-export function SearchError({ query, onRetry }: SearchErrorProps) {
+export function SearchError() {
   return (
     <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/20 bg-destructive/5 py-16 px-6">
@@ -29,15 +24,10 @@ export function SearchError({ query, onRetry }: SearchErrorProps) {
           Couldn't find movies
         </h3>
         <p className="mb-6 text-center text-muted-foreground max-w-md text-balance">
-          We had trouble searching for "{query}". Please check your connection
-          and try again.
+          We had trouble searching for movies that match your vibe. This is
+          because your vibe is unmatched! Please check your connection and try
+          again later...
         </p>
-        <button
-          onClick={onRetry}
-          className="rounded-md bg-primary px-6 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-        >
-          Try Again
-        </button>
       </div>
     </div>
   );

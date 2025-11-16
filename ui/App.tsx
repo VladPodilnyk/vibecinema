@@ -44,7 +44,11 @@ function App() {
           )}
 
           <SearchBar onSearch={handleSearch} />
-          <SearchResults movies={movies} isLoading={isLoading} />
+          <SearchResults
+            movies={movies}
+            isLoading={isLoading}
+            isError={isError}
+          />
         </div>
       </div>
     </div>
