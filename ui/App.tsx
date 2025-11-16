@@ -1,35 +1,28 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { SearchBar } from "./components/search-bar";
 import { SearchResults } from "./components/search-results";
 import { useSearchParams } from "react-router";
-import client from "./client/api";
-import type { Movie } from "../worker/types";
+import { useVibe } from "./hooks/useVibe";
 
 function App() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [isSearching, setIsSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<Movie[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { movies, isError, isLoading, vibe } = useVibe();
+
+  const query = searchParams.get("q");
+  const isSearching = Boolean(query);
 
   useEffect(() => {
-    const query = searchParams.get("q");
     if (query) {
-      setIsSearching(true);
-      setIsLoading(true);
-      setTimeout(() => setIsLoading(false), 1500);
+      vibe(query);
     }
   }, [searchParams]);
 
-  const handleSearch = async (query: string) => {
-    setSearchParams(`/?q=${encodeURIComponent(query)}`);
-    setIsSearching(true);
-    setIsLoading(true);
-
-    const response = await client.vibe.$get({ query: { q: query } });
-    const { movies } = await response.json();
-    setSearchResults(movies);
-    setIsLoading(false);
-  };
+  const handleSearch = useCallback(
+    (query: string) => {
+      setSearchParams({ q: query });
+    },
+    [searchParams]
+  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -42,19 +35,16 @@ function App() {
           {!isSearching && (
             <div className="mb-12 text-center animate-in fade-in duration-700">
               <h1 className="mb-4 text-6xl font-bold tracking-tight text-foreground text-balance">
-                What mood do you have today?
+                What vibe do you have today?
               </h1>
               <p className="text-xl text-muted-foreground">
-                Discover content that matches your vibe
+                Discover movies that match your mood
               </p>
             </div>
           )}
 
           <SearchBar onSearch={handleSearch} />
-
-          {isSearching && (
-            <SearchResults movies={searchResults} isLoading={isLoading} />
-          )}
+          <SearchResults movies={movies} isLoading={isLoading} />
         </div>
       </div>
     </div>

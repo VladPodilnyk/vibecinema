@@ -22,6 +22,10 @@ interface SearchResultsProps {
 }
 
 export function SearchResults({ movies, isLoading }: SearchResultsProps) {
+  if (movies.length === 0) {
+    return null;
+  }
+
   return (
     <div className="mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {isLoading ? (

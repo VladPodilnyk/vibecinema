@@ -27,7 +27,7 @@ export function SearchBar({ onSearch }: SearchBarProps) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Happy, sad, energetic, calm..."
+          placeholder="Mysterious, sparkling, chill..."
           className="flex-1 bg-transparent text-lg text-foreground placeholder:text-muted-foreground focus:outline-none"
         />
         <Button
